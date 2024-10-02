@@ -19,11 +19,11 @@ const Tabs = ({ activeTab }: Props) => {
 
     const onTabChange = (tab: string) => {
         const params = new URLSearchParams(searchParams);
-        if(tab as string === 'all') params.delete('tab')
+        if (tab as string === 'all') params.delete('tab')
         else params.set('tab', tab);
         replace(`${pathname}?${params.toString()}`);
     }
-
+ 
     return (
         <div className='flex w-full mt-6 relative '>
             <>
