@@ -13,8 +13,7 @@ export default async function InvoicesTable({
   currentPage: number
   currentTab: string
 }) {
-  const invoices = await fetchFilteredInvoices(query, currentPage, currentTab);
-  console.log(invoices)
+  const invoices = await fetchFilteredInvoices(query, currentPage, currentTab.toLowerCase());
 
   return (
     <div className="mt-6 flow-root">

@@ -89,44 +89,22 @@ export async function fetchFilteredInvoices(
   currentPage: number,
   currentTab: string
 ) {
-  let statusFilter = `invoices.status IN ('Pending', 'Paid', 'Canceled')`;
+  let statusFilter = `AND invoices.status = 'pending'`;
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
-  if (currentTab === 'Paid' || currentTab === 'Canceled') {
-    statusFilter = `invoices.status = ${currentTab}`;
-  } else if (currentTab === 'Overdue') {
-    // For overdue, get pending invoices older than 14 days
-    statusFilter = `invoices.status = 'Pending' AND invoices.date < NOW() - INTERVAL '14 days'`;
-  } else if (currentTab === 'Pending') {
-    // For pending, get pending invoices less than 14 days old
-    statusFilter = `invoices.status = 'Pending' AND invoices.date >= NOW() - INTERVAL '14 days'`;
+
+  if (currentTab === 'paid' || currentTab === 'canceled') {
+    statusFilter = `AND invoices.status = '${currentTab}'`;
+  } else if (currentTab === 'overdue') {
+    statusFilter = `AND invoices.status = 'pending' AND invoices.date < NOW() - INTERVAL '14 days'`;
+  } else if (currentTab === 'pending') {
+    statusFilter = `AND invoices.status = 'pending' AND invoices.date >= NOW() - INTERVAL '14 days'`;
   }
 
-  console.log('qwee', `
-      SELECT
-        invoices.id,
-        invoices.amount,
-        invoices.date,
-        invoices.status,
-        invoices.customer_id,
-        customers.name,
-        customers.email,
-        customers.image_url
-      FROM invoices
-      JOIN customers ON invoices.customer_id = customers.id
-      WHERE
-        customers.name ILIKE ${`%${query}%`} OR
-        customers.email ILIKE ${`%${query}%`} OR
-        invoices.amount::text ILIKE ${`%${query}%`} OR
-        invoices.date::text ILIKE ${`%${query}%`} OR
-        invoices.status ILIKE ${`%${query}%`} AND
-        ${statusFilter}
-      ORDER BY invoices.date DESC
-      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
-    `)
-
   try {
-    const invoices = await sql<InvoicesTable>`
+    let invoices
+    if (currentTab === 'all') {
+      invoices = await sql<InvoicesTable>`
       SELECT
         invoices.id,
         invoices.amount,
@@ -139,16 +117,39 @@ export async function fetchFilteredInvoices(
       FROM invoices
       JOIN customers ON invoices.customer_id = customers.id
       WHERE
-        customers.name ILIKE ${`%${query}%`} OR
+        (customers.name ILIKE ${`%${query}%`} OR
         customers.email ILIKE ${`%${query}%`} OR
         invoices.amount::text ILIKE ${`%${query}%`} OR
         invoices.date::text ILIKE ${`%${query}%`} OR
-        invoices.status ILIKE ${`%${query}%`}
+        invoices.status ILIKE ${`%${query}%`}) 
       ORDER BY invoices.date DESC
       LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
-    `;
+   `;
+    }
+    else invoices = await sql<InvoicesTable>`
+      SELECT
+        invoices.id,
+        invoices.amount,
+        invoices.date,
+        invoices.status,
+        invoices.customer_id,
+        customers.name,
+        customers.email,
+        customers.image_url
+      FROM invoices
+      JOIN customers ON invoices.customer_id = customers.id
+      WHERE
+        (customers.name ILIKE ${`%${query}%`} OR
+        customers.email ILIKE ${`%${query}%`} OR
+        invoices.amount::text ILIKE ${`%${query}%`} OR
+        invoices.date::text ILIKE ${`%${query}%`} OR
+        invoices.status ILIKE ${`%${query}%`})  
+       AND invoices.status = ${currentTab}
+      ORDER BY invoices.date DESC
+      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+   `;
 
-    console.log('qwe', invoices)
+
 
     return invoices.rows;
   } catch (error) {

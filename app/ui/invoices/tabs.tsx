@@ -1,24 +1,40 @@
+'use client'
+
+import { Tab as TabT } from '@/app/dashboard/invoices/page'
 import clsx from 'clsx'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React from 'react'
 
 type Props = {
     activeTab: string
 }
 
-const Tabs = ({ activeTab }: Props) => {
-    const tabs = ['All', 'Paid', 'Pending', 'Overdue', 'Canceled']
+const tabs: TabT[] = ['All', 'Paid', 'Pending', 'Canceled']
 
+
+const Tabs = ({ activeTab }: Props) => {
+    const searchParams = useSearchParams();
+    const { replace } = useRouter();
+    const pathname = usePathname();
+
+    const onTabChange = (tab: TabT) => {
+        const params = new URLSearchParams(searchParams);
+        if(tab === 'all') params.delete('tab')
+        else params.set('tab', tab);
+        replace(`${pathname}?${params.toString()}`);
+    }
 
     return (
         <div className='flex w-full mt-6 relative '>
             <>
                 {tabs.map((tab) => {
-                    const isActive = activeTab === tab
+                    const isActive = activeTab === tab.toLowerCase()
                     return (
                         <Tab
                             key={tab}
                             label={tab}
                             isActive={isActive}
+                            onTabClick={onTabChange}
                         />
                     )
                 })}
@@ -29,14 +45,17 @@ const Tabs = ({ activeTab }: Props) => {
 }
 
 type TabProps = {
-    label: string
+    label: TabT
     isActive: boolean
+    onTabClick: (tab: TabT) => void
 }
 
-const Tab = ({ label, isActive }: TabProps) => {
+const Tab = ({ label, isActive, onTabClick }: TabProps) => {
 
     return (
-        <div className='flex flex-col relative w-full text-center cursor-pointer pb-1 group' >
+        <div onClick={() => {
+            onTabClick(label.toLowerCase())
+        }} className='flex flex-col relative w-full text-center cursor-pointer pb-1 group' >
             <p className={clsx('text-blue-400 text-sm', {
                 'text-blue-600 font-medium': isActive
             })}>{label}</p>
