@@ -7,11 +7,13 @@ import { fetchFilteredInvoices } from '@/app/lib/data';
 export default async function InvoicesTable({
   query,
   currentPage,
+  currentTab
 }: {
-  query: string;
-  currentPage: number;
+  query: string
+  currentPage: number
+  currentTab: string
 }) {
-  const invoices = await fetchFilteredInvoices(query, currentPage);
+  const invoices = await fetchFilteredInvoices(query, currentPage, currentTab);
   console.log(invoices)
 
   return (

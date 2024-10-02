@@ -87,8 +87,43 @@ const ITEMS_PER_PAGE = 6;
 export async function fetchFilteredInvoices(
   query: string,
   currentPage: number,
+  currentTab: string
 ) {
+  let statusFilter = `invoices.status IN ('Pending', 'Paid', 'Canceled')`;
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  if (currentTab === 'Paid' || currentTab === 'Canceled') {
+    statusFilter = `invoices.status = ${currentTab}`;
+  } else if (currentTab === 'Overdue') {
+    // For overdue, get pending invoices older than 14 days
+    statusFilter = `invoices.status = 'Pending' AND invoices.date < NOW() - INTERVAL '14 days'`;
+  } else if (currentTab === 'Pending') {
+    // For pending, get pending invoices less than 14 days old
+    statusFilter = `invoices.status = 'Pending' AND invoices.date >= NOW() - INTERVAL '14 days'`;
+  }
+
+  console.log('qwee', `
+      SELECT
+        invoices.id,
+        invoices.amount,
+        invoices.date,
+        invoices.status,
+        invoices.customer_id,
+        customers.name,
+        customers.email,
+        customers.image_url
+      FROM invoices
+      JOIN customers ON invoices.customer_id = customers.id
+      WHERE
+        customers.name ILIKE ${`%${query}%`} OR
+        customers.email ILIKE ${`%${query}%`} OR
+        invoices.amount::text ILIKE ${`%${query}%`} OR
+        invoices.date::text ILIKE ${`%${query}%`} OR
+        invoices.status ILIKE ${`%${query}%`} AND
+        ${statusFilter}
+      ORDER BY invoices.date DESC
+      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    `)
 
   try {
     const invoices = await sql<InvoicesTable>`
@@ -112,6 +147,8 @@ export async function fetchFilteredInvoices(
       ORDER BY invoices.date DESC
       LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
     `;
+
+    console.log('qwe', invoices)
 
     return invoices.rows;
   } catch (error) {

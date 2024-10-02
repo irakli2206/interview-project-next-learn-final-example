@@ -4,7 +4,7 @@ import { CheckIcon, ClockIcon, ArchiveBoxXMarkIcon } from '@heroicons/react/24/o
 import clsx from 'clsx';
 import moment from 'moment'
 import { useEffect, useState } from 'react';
-import Dropdown from '../dropdown';
+import Dropdown from './dropdown';
 
 export default function InvoiceStatus({ status, date, amount, customerId, id }: { status: string, date: string, amount: number, customerId: string, id: string }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)

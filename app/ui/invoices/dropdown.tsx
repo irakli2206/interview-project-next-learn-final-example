@@ -1,7 +1,7 @@
 
 import React from 'react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-import { updateInvoice } from '../lib/actions'
+import { updateInvoice } from '../../lib/actions'
 
 type Props = {
     isOpen: boolean
@@ -24,9 +24,9 @@ const Dropdown = ({ isOpen, onClose, invoiceId, amount, customerId }: Props) => 
                         console.log(Object.fromEntries(formData.entries()))
                         updateInvoice(invoiceId, {}, formData)
                     }}
-                    className='absolute rounded-sm  drop-shadow-sm p-1 bg-white flex flex-col border border-gray-200 mt-0.5 -translate-x-1/2 left-1/2'>
+                    className='absolute rounded-sm w-48 drop-shadow-sm p-1 bg-white flex flex-col border border-gray-200 mt-0.5 '>
                     <header className="flex justify-between items-center border-b pb-1 gap-4 border-gray-200">
-                        <p className='font-medium  '>Set status</p>
+                        <p className='font-medium  pl-2'>Set status</p>
                         <button onClick={onClose} className='ml-auto p-1 hover:bg-gray-200  rounded-sm'>
                             <XMarkIcon className=" w-4 text-gray-500" />
                         </button>
@@ -35,7 +35,7 @@ const Dropdown = ({ isOpen, onClose, invoiceId, amount, customerId }: Props) => 
                         {
                             statuses.map((status) => {
                                 return (
-                                    <button key={status} type='submit' className='hover:bg-gray-200 text-start px-2 rounded-sm '
+                                    <button key={status} type='submit' className='hover:bg-gray-100 text-start px-2 rounded-sm py-1.5'
                                         name="status"
                                         value={status.toLowerCase()}
                                     >
