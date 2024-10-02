@@ -23,7 +23,7 @@ const Tabs = ({ activeTab }: Props) => {
         else params.set('tab', tab);
         replace(`${pathname}?${params.toString()}`);
     }
- 
+  
     return (
         <div className='flex w-full mt-6 relative '>
             <>
