@@ -9,7 +9,7 @@ type Props = {
     activeTab: string
 }
 
-const tabs: TabT[] = ['All', 'Paid', 'Pending', 'Canceled']
+const tabs: string[] = ['All', 'Paid', 'Pending', 'Canceled']
 
 
 const Tabs = ({ activeTab }: Props) => {
@@ -17,9 +17,9 @@ const Tabs = ({ activeTab }: Props) => {
     const { replace } = useRouter();
     const pathname = usePathname();
 
-    const onTabChange = (tab: TabT) => {
+    const onTabChange = (tab: string) => {
         const params = new URLSearchParams(searchParams);
-        if(tab === 'all') params.delete('tab')
+        if(tab as string === 'all') params.delete('tab')
         else params.set('tab', tab);
         replace(`${pathname}?${params.toString()}`);
     }
@@ -45,9 +45,9 @@ const Tabs = ({ activeTab }: Props) => {
 }
 
 type TabProps = {
-    label: TabT
+    label: string
     isActive: boolean
-    onTabClick: (tab: TabT) => void
+    onTabClick: (tab: string) => void
 }
 
 const Tab = ({ label, isActive, onTabClick }: TabProps) => {
