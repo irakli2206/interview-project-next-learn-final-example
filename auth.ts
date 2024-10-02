@@ -15,7 +15,7 @@ async function getUser(email: string): Promise<User | undefined> {
     throw new Error('Failed to fetch user.');
   }
 }
-
+ 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
   providers: [
